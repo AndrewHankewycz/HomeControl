@@ -16,7 +16,7 @@ import android.widget.Toast;
  */
 public class GetCalendarTask extends AsyncTask<String, Void, Boolean> { // first String is what is passed in (.execute(url)), second is for progress update,
     // last if what is passed on doInBackground to onPostExecute. Nothing is returned to the calling method
-    private static final String TAG = "DownloadJSONUninits";
+    private static final String TAG = "GetCalendarTask";
     private MobileActivity activity;  // stores a MobileActivity object so I dont have to keep calling getActivity
     private ProgressDialog pDialog;
 
@@ -53,8 +53,8 @@ public class GetCalendarTask extends AsyncTask<String, Void, Boolean> { // first
         String selection = "((" + Calendars.ACCOUNT_NAME + " = ?) AND ("
                 + Calendars.ACCOUNT_TYPE + " = ?) AND ("
                 + Calendars.OWNER_ACCOUNT + " = ?))";
-        String[] selectionArgs = new String[] {"ahankewycz@gmail.com", "com.google",
-                "ahankewycz@gmail.com"};
+        String[] selectionArgs = new String[] {"email@gmail.com", "com.google",
+                "email@gmail.com"};
 // Submit the query and get a Cursor object back.
         cur = cr.query(uri, EVENT_PROJECTION, selection, selectionArgs, null);
 
