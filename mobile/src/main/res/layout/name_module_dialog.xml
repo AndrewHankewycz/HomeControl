@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/new_mod_dialog_type"
+        style="@style/textHeading"
+        android:padding="5dp"
+        />
+    <TextView
+        android:id="@+id/new_mod_dialog_addr"
+        style="@style/textHeading"
+        android:padding="5dp"
+        />
+    <EditText
+        android:id="@+id/new_mod_dialog_name"
+        style="@style/textHeading"
+        android:fontFamily="sans-serif"
+        android:hint="Module Name"
+        android:inputType="textCapSentences|textNoSuggestions"
+        android:imeOptions="actionDone"/>
+</LinearLayout>

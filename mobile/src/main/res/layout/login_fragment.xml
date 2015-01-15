@@ -1,0 +1,70 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="horizontal"
+    tools:context=".MainActivity"
+    style="@style/Theme.AppCompat.Light.DarkActionBar"
+    android:id="@+id/login_fragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingBottom="110dp"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/textStandard"
+            android:paddingBottom="20dp"
+            android:layout_gravity="center"
+            android:text="@string/login_prompt"/>
+        <!--<TextView-->
+            <!--style="@style/textHeading"-->
+            <!--android:paddingTop="20dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:text="@string/network_name_textview" >-->
+            <!--</TextView>-->
+        <!--<Spinner-->
+            <!--android:id="@+id/login_network_name"-->
+            <!--android:layout_width="200dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:paddingTop="10dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--/>-->
+
+
+        <TextView
+            style="@style/textHeading"
+            android:paddingTop="20dp"
+            android:layout_gravity="center"
+            android:text="@string/passcode_textview"/>
+        <EditText
+            android:id="@+id/login_passcode"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_gravity="center"
+            android:inputType="numberPassword"
+            android:imeOptions="actionDone"
+            />
+
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:layout_gravity="center"
+            android:textSize="20dp"
+            android:text="Login"/>
+    </LinearLayout>
+
+</LinearLayout>

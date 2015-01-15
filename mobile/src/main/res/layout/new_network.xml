@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/textHeading"
+        android:paddingTop="40dp"
+        android:paddingLeft="40dp"
+        android:paddingBottom="10dp"
+        android:text="@string/new_user_title"/>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray"/>
+
+    <TextView
+        style="@style/textStandard"
+        android:padding="10dp"
+        android:text="@string/new_user_message"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/textStandard"
+            android:padding="10dp"
+            android:text="@string/network_name_textview"/>
+        <EditText
+            android:id="@+id/new_network_name_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:inputType="textCapSentences|textNoSuggestions"
+            android:imeOptions="actionNext"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/textStandard"
+            android:padding="10dp"
+            android:text="@string/network_ip_textview"/>
+        <EditText
+            android:id="@+id/new_ip_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:inputType="textUri"
+            android:imeOptions="actionNext"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/new_user_ok_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:textSize="20sp"
+            android:text="@string/ok"/>
+
+    </LinearLayout>
+
+</LinearLayout>

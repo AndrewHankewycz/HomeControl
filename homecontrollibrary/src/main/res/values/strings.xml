@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HomeControlLibrary</string>
+    <string name="service_name">HANService</string>
+    <string name="title_activity_download_jsontask">DownloadJSONTask</string>
+    <string name="requestData_ext">/homeauto/requestData.php</string>
+    <string name="requestSortedData_ext">/homeauto/requestSortedData.php</string>
+    <string name="updateModule_ext">/homeauto/updateModule.php</string>
+    <string name="requestUninit_ext">/homeauto/requestUninit.php</string>
+    <string name="newModule_ext">/homeauto/newModule.php</string>
+    <string name="removeModule_ext">/homeauto/removeModule.php</string>
+
+</resources>

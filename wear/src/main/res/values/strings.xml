@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">HomeControl</string>
+    <string name="turning_off_msg">Turnig Off</string>
+    <string name="turning_on_msg">Turning On</string>
+    <string name="turn_off_label">Turn Off</string>
+    <string name="turn_on_label">Turn On</string>
+
+</resources>
