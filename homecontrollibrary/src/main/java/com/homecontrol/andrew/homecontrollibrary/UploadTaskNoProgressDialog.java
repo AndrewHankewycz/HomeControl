@@ -1,10 +1,8 @@
 package com.homecontrol.andrew.homecontrollibrary;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -23,11 +21,10 @@ import java.util.List;
 /**
  * Created by andrew on 8/6/14.
  */
-public class UploadTaskNoProgress extends AsyncTask<String, Void, Void> {
+public class UploadTaskNoProgressDialog extends AsyncTask<String, Void, Void> {
     private static final String TAG = "Upload Task No Progress";
-    ProgressDialog pDialog;
 
-    public UploadTaskNoProgress(){
+    public UploadTaskNoProgressDialog(){
     }
 
     @Override

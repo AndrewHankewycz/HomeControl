@@ -23,8 +23,6 @@ public class DownloadJSONTask extends AsyncTask<Void, Void, String> { // first S
     // last if what is passed on doInBackground to onPostExecute. Nothing is returned to the calling method
     private static final String TAG = "DownloadJSONTask";
     private static final String GETJSONTEXT_MESSAGE = "getJSONText";
-    //private MainFragment fragment;
-    //private FragmentCommunication fragComm;
     private MobileActivity activity;  // stores a MobileActivity object so I dont have to keep calling getActivity
     private ProgressDialog pDialog;
     private JSONArray jsonArray;
@@ -32,7 +30,6 @@ public class DownloadJSONTask extends AsyncTask<Void, Void, String> { // first S
     //private HttpsURLConnection urlConnection;
 
     public DownloadJSONTask(MobileActivity mainActivity, String phpScript){
-        //this.fragment = (MainFragment) fragment;
         activity = mainActivity;
         Log.d(TAG, "beginning download");
         phpUrl = phpScript;
@@ -50,7 +47,6 @@ public class DownloadJSONTask extends AsyncTask<Void, Void, String> { // first S
 
     @Override
     protected String doInBackground(Void... voids) {
-        //String url = strings[0] + mobileActivity.getString(R.string.requestData_ext); dont need this anymore
         return getJSONText(phpUrl);    // might still be null if there was an exception
     }
 
@@ -65,7 +61,6 @@ public class DownloadJSONTask extends AsyncTask<Void, Void, String> { // first S
                 //create jsonArray and call createButtons
                 Log.d(TAG, result);
                 this.jsonArray = new JSONArray(result);
-                //fragment.jsonArray = jsonArray; // old method
                 Log.d(TAG, "assigned result to JSONArray");
                 activity.parseJSON(jsonArray);
                 activity.updateButtons();   // once the response has been parsed we can make buttons
@@ -85,9 +80,8 @@ public class DownloadJSONTask extends AsyncTask<Void, Void, String> { // first S
         try{
             URL url = new URL(myUrl);
             Log.d(TAG, myUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();  // openConnetion() may throw IOException
-            //urlConnection = (HttpsURLConnection) url.openConnection();  // openConnetion() may throw IOException
-            // using ssl, the url is hard coded below in the setUpCertificate method
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();  // used for standard http, openConnetion() may throw IOException
+            //urlConnection = (HttpsURLConnection) url.openConnection();  // used for https, openConnetion() may throw IOException
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
             conn.setRequestMethod("GET");
@@ -127,12 +121,12 @@ public class DownloadJSONTask extends AsyncTask<Void, Void, String> { // first S
         }
         return result;
     }
+
 /*
     private void setUpCertificate(){
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-// From https://www.washington.edu/itconnect/security/ca/load-der.crt
-            InputStream caInput = new BufferedInputStream(new FileInputStream("/storage/sdcard0/documents/han.crt"));
+            InputStream caInput = new BufferedInputStream(new FileInputStream("/storage/sdcard0/documents/han.crt"));       // fill in certificate location here
             Certificate ca;
             try {
                 ca = cf.generateCertificate(caInput);
@@ -141,24 +135,23 @@ public class DownloadJSONTask extends AsyncTask<Void, Void, String> { // first S
                 caInput.close();
             }
 
-// Create a KeyStore containing our trusted CAs
+            // Create a KeyStore containing the trusted CA
             String keyStoreType = KeyStore.getDefaultType();
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", ca);
 
-// Create a TrustManager that trusts the CAs in our KeyStore
+            // Create a TrustManager that trusts the CA in the KeyStore
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
             tmf.init(keyStore);
 
-// Create an SSLContext that uses our TrustManager
+            // Create an SSLContext that uses the TrustManager
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, tmf.getTrustManagers(), null);
 
-// Tell the URLConnection to use a SocketFactory from our SSLContext
-            URL url = new URL("https://thesiliconjunkie.com/homeauto/requestData.php");     // specifying the url with https:// and no www. this matches the certificate
-            //URL url = new URL("https://65.185.86.163/homeauto/requestData.php");     // specifying the url with https:// and no www. this matches the certificate
+            // Tell the URLConnection to use a SocketFactory from the SSLContext
+            URL url = new URL(phpUrl + getString(R.string.requestData_ext));     // the url should already be specified in settings to be using https
             urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setSSLSocketFactory(context.getSocketFactory());
             //InputStream in = urlConnection.getInputStream();

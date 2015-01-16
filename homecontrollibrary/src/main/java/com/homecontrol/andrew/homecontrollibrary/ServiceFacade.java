@@ -80,31 +80,6 @@ public class ServiceFacade {
         return serviceFacade;
     }
 
-
-//    public ServiceFacade(Context ctx, Activity activity){
-//        // default constructor
-//        context = ctx;
-//        if(activity instanceof MobileFacadeInterface){
-//            Log.e(TAG, "making new service for Mobile");
-//            mobileActivity = (MobileFacadeInterface) activity;
-//            wearEventListener = null;       // we wont be using this
-//        }else if(ctx instanceof WearEventListener){
-//            Log.e(TAG, "making new service for Wearable");
-//            wearEventListener = (WearEventListener) context;
-//            mobileActivity = null;  // we wont be using the callback so leave it null
-//        }else{
-//            Log.e(TAG, "not sure what service to make");
-//        }
-//        // ill need to work on this. if the requst comes from wearlistener there could be some serious problems later *******
-//    }
-
-//    public static ServiceFacade getInstance(Context ctx, Activity mobileActivity){
-//        if(serviceFacade == null){
-//            serviceFacade = new ServiceFacade(ctx, mobileActivity);   // create instance of serviceFacade
-//        }
-//        return serviceFacade;
-//    }
-
     public void loadAppData(int deviceType){
         doingWhat = LOADING_APP_DATA;   // set what we are doing, so we can pick up later if needed
         madeRequest = deviceType;       // not really sure this is needed. I dont think the watch will ever make this request
@@ -125,7 +100,7 @@ public class ServiceFacade {
             context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         }else{
             sendLoadNetworkDataMsg(networkName);     // we have a binder, call this method to request HANService to load a different network's data
-            // this will respond if there was an account or not
+            // this will respond with the network name and url
         }
     }
 
@@ -135,7 +110,7 @@ public class ServiceFacade {
             context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         }else{
             sendSaveAppDataMsg();     // we have a binder, call this method to request HANService to load last used network data
-            // this will respond if there was an account or not
+            // saves app data, last network used...
         }
     }
 
@@ -145,19 +120,9 @@ public class ServiceFacade {
             context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         }else{
             sendClearAppPreferences();     // we have a binder, call this method to request HANService to clear all app preferences
-            // no response will be sent
+            // future plans will send a response back for the NewUserFragment
         }
     }
-
-//    public void getNetworkList(){
-//        // triggers events to return a list of available networks
-//        if(!mIsBound) {
-//            Intent i = new Intent(context, HANService.class);
-//            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-//        }else{
-//            sendGetNetworkListMsg();     // we have a binder, call this method to get a list of networks
-//        }
-//    }
 
     public void saveNetwork(){
         // saves the network preferences for the current network
@@ -167,7 +132,7 @@ public class ServiceFacade {
         }else{
             sendSaveNetworkMsg();     // we have a binder, call this method to save the current networks preference
         }
-        // doesnt wait for response from HANService
+        // no response is sent back
     }
 
     public void removeNetwork(String networkToRemove){
@@ -178,7 +143,7 @@ public class ServiceFacade {
         }else{
             sendRemoveNetworkMsg(networkToRemove);     // we have a binder, call this method to remove the specified network preference
         }
-        // doesnt wait for response from HANService
+        // doesnt get a response from HANService
     }
 
     public void validateLogin(String enteredPasscode){
@@ -190,6 +155,7 @@ public class ServiceFacade {
         }else{
             sendValidateLoginMsg(enteredPasscode);     // we have a binder, call this method to send the message to the HANService
         }
+        // response is sent back, if the login is successful of not
     }
 
     public void updateNetworkData(String networkName, String networkAddress){
@@ -221,6 +187,7 @@ public class ServiceFacade {
         }else{
             sendDownloadModulesMsg();     // we have a binder, call this method to send the message to the HANService to download modules
         }
+        // expects a reply from the HANService
     }
 
     public void modifyModuleData(String[] valuesArray){
@@ -230,6 +197,7 @@ public class ServiceFacade {
         }else{
             sendModifyModuleDataMsg(valuesArray);     // we have a binder, call this method to send the message to the HANService to upload the module changes
         }
+        // no reply expected
     }
 
     public void setAccountPasscode(String enteredPasscode){
@@ -239,6 +207,7 @@ public class ServiceFacade {
         }else{
             sendSetPasscodeMsg(enteredPasscode);     // we have a binder, call this method to send the app passcode
         }
+        // no reply expected
     }
 
     private void sendLoadAppDataMsg(){
@@ -248,29 +217,23 @@ public class ServiceFacade {
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
     private void sendLoadNetworkDataMsg(String netoworkName){
         try {
             Bundle bundle = new Bundle();
-            bundle.putString(LOAD_NETWORK_DATA_NAME_KEY, netoworkName);      // attach the string the user entered to the bundle
+            bundle.putString(LOAD_NETWORK_DATA_NAME_KEY, netoworkName);      // attach the specified network to the bundle
             Message msg = Message.obtain(null, HANService.LOAD_NETWORK_DATA);         // create message to send to HANService so it will load a specified network's data
             msg.replyTo = messengerSelf;       // add a reference to this, for HANService to reply to
             msg.setData(bundle);
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -281,11 +244,8 @@ public class ServiceFacade {
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -296,11 +256,8 @@ public class ServiceFacade {
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -314,11 +271,8 @@ public class ServiceFacade {
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -334,11 +288,8 @@ public class ServiceFacade {
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -354,11 +305,8 @@ public class ServiceFacade {
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -369,11 +317,8 @@ public class ServiceFacade {
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -382,17 +327,14 @@ public class ServiceFacade {
             Log.d(TAG, "sending remove ["+ networkName + "] network to HANService");
             Bundle bundle = new Bundle();
             bundle.putString(REMOVE_NETWORK_NAME_KEY, networkName);      // attach the new network name
-            Message msg = Message.obtain(null, HANService.REMOVE_NETWORK);         // create message to send to HANService to update the current network values
+            Message msg = Message.obtain(null, HANService.REMOVE_NETWORK);         // create message to send to HANService to remove the all data for the specified network
             msg.replyTo = messengerSelf;       // add a reference to this, for HANService to reply to
             msg.setData(bundle);
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -406,11 +348,8 @@ public class ServiceFacade {
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -418,17 +357,14 @@ public class ServiceFacade {
         Bundle bundle = new Bundle();
         bundle.putStringArray(MODULE_UPLOAD_STRING_KEY, valuesArray);
         try {
-            Message msg = Message.obtain(null, HANService.UPLOAD_OP);         // create message to send to HANService to request updating server data for specified module
+            Message msg = Message.obtain(null, HANService.UPLOAD_OP);         // create message to send to HANService to request updating module data on the network server
             msg.replyTo = messengerSelf;       // add a reference to this, for HANService to reply to
             msg.setData(bundle);
             mService.send(msg);             // send the message to HANService
         } catch (RemoteException e) {
             // In this case the service has crashed before we could even
-            // do anything with it; we can count on soon being
-            // disconnected (and then reconnected if it can be restarted)
-            // so there is no need to do anything here.
-
-            // ****** i think i should handle this ****
+            // do anything with it; we do not restart the service by default
+            // so I will potentially need to handle this
         }
     }
 
@@ -476,7 +412,6 @@ public class ServiceFacade {
             Log.d(TAG, "getting reply from HANService");
             Bundle bundle = msg.getData();
 
-            final String result = bundle.getString("mods_string");        // this is where I left off, the string is null for some reason
             switch (msg.what) {
                 case VALIDATION_REPLY:
                     Log.d(TAG, "received login reply from HANService");
@@ -498,10 +433,6 @@ public class ServiceFacade {
                             String networkName = bundle.getString(HANService.LOAD_APP_DATA_NETWORK_NAME);   // load current network name from bundle
                             String networkAddress = bundle.getString(HANService.LOAD_APP_DATA_NETWORK_ADDRESS); // load current network url
                             ArrayList<String> networkList = bundle.getStringArrayList(HANService.LOAD_APP_DATA_NETWORK_LIST);
-//                        String[] networkList = (String[]) list.toArray();
-//                        for(int i = 0; i < networkList.length; i++){
-//                            Log.d(TAG, "printing network list: " + networkList[i]);
-//                        }
                             mobileActivity.setCurrentNetworkData(networkName, networkAddress);       // send current network name to MobileActivity
                             mobileActivity.setNetworkList(networkList);       // pass the network list
                             mobileActivity.promptForLogin();
@@ -510,7 +441,7 @@ public class ServiceFacade {
                             ((MobileFacadeInterface) mobileActivity).promptForNewUser();
                         }
                     }else if(madeRequest == WEAR_DEVICE){
-                        Log.d(TAG, "skipping sending data back at this time since the request came from wear device");
+                        Log.d(TAG, "skipping sending data back at this time since the request came from a wear device");
                     }
                     break;
                 case LOAD_NETWORK_DATA_REPLY:

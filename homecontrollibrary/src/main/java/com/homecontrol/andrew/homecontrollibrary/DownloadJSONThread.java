@@ -32,20 +32,17 @@ public class DownloadJSONThread implements Runnable {
                 service.returnJSONDownload(response);      // return data to service
             }
         });
-
     }
 
     private String getJSONText(String myUrl){
         Log.d(TAG, "attemping to download stuff");
         InputStream is = null;  // input stream
         String content = null;
-        //setUpCertificate();
         try{
             URL url = new URL(myUrl);
             Log.d(TAG, myUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();  // openConnetion() may throw IOException
-            //urlConnection = (HttpsURLConnection) url.openConnection();  // openConnetion() may throw IOException
-            // using ssl, the url is hard coded below in the setUpCertificate method
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();  // used for http, openConnetion() may throw IOException
+            //urlConnection = (HttpsURLConnection) url.openConnection();  // used for https, openConnetion() may throw IOException
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
             conn.setRequestMethod("GET");
@@ -85,4 +82,56 @@ public class DownloadJSONThread implements Runnable {
         }
         return result;
     }
+
+/*
+    // Set up to use trusted SSL certificate loaded to the device
+    private void setUpCertificate(){
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            InputStream caInput = new BufferedInputStream(new FileInputStream("/storage/sdcard0/documents/han.crt"));       // fill in certificate location here
+            Certificate ca;
+            try {
+                ca = cf.generateCertificate(caInput);
+                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+            } finally {
+                caInput.close();
+            }
+
+            // Create a KeyStore containing the trusted CA
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+
+            // Create a TrustManager that trusts the CA in the KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            // Create an SSLContext that uses the TrustManager
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, tmf.getTrustManagers(), null);
+
+            // Tell the URLConnection to use a SocketFactory from the SSLContext
+            URL url = new URL(phpUrl + getString(R.string.requestData_ext));     // the url should already be specified in settings to be using https
+            urlConnection = (HttpsURLConnection) url.openConnection();
+            urlConnection.setSSLSocketFactory(context.getSocketFactory());
+            //InputStream in = urlConnection.getInputStream();
+            //copyStream(in, System.out);
+        }catch(Exception e){
+            Log.e(TAG, e.toString());
+        }
+    }
+    public static void copyStream(InputStream input, OutputStream output)
+            throws IOException
+    {
+        byte[] buffer = new byte[1024]; // Adjust if you want
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1)
+        {
+            output.write(buffer, 0, bytesRead);
+        }
+    }
+}
+*/
 }

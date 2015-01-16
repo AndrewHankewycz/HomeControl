@@ -28,10 +28,11 @@ public class HANService extends Service {
     private HANService hanService;
     private NetworkData networkData;
     private HashSet<Messenger> listOfObservers = new HashSet();
-    // this gets passed to clients for them to make calls back
+
+    // this gets passed to clients for them to make calls back to the service, in onServiceConnected
     private Messenger mMessenger = new Messenger(new IncomingMessageHandler());
 
-    // keys for storing data to preferences
+    // keys for storing data in shared preferences
     private static final String APP_PREFERENCES_KEY = "app_preferences";
     private static final String LAST_NETWORK_USED_KEY = "lastNetworkUsed";
     private static final String NETWORK_LIST_KEY = "networkList";
@@ -43,17 +44,16 @@ public class HANService extends Service {
     // constants for determining HANService requests
     public static final int DOWNLOAD_OP = 0;
     public static final int UPLOAD_OP = 1;
-    public static final int DOWNLOAD_DONE = 2;
-    public static final int VALIDATE_LOGIN_OP = 3;
-    public static final int LOAD_APP_DATA = 4;
-    public static final int LOAD_NETWORK_DATA = 5;
-    public static final int SAVE_APP_DATA = 6;
-    public static final int CLEAR_APP_PREFERENCES = 7;
-    public static final int UPDATE_CURRENT_NETWORK = 8;
-    public static final int CREATE_NEW_NETWORK = 9;
-    public static final int SAVE_NETWORK = 10;
-    public static final int REMOVE_NETWORK = 11;
-    public static final int SET_PASSCODE = 12;
+    public static final int VALIDATE_LOGIN_OP = 2;
+    public static final int LOAD_APP_DATA = 3;
+    public static final int LOAD_NETWORK_DATA = 4;
+    public static final int SAVE_APP_DATA = 5;
+    public static final int CLEAR_APP_PREFERENCES = 6;
+    public static final int UPDATE_CURRENT_NETWORK = 7;
+    public static final int CREATE_NEW_NETWORK = 8;
+    public static final int SAVE_NETWORK = 9;
+    public static final int REMOVE_NETWORK = 10;
+    public static final int SET_PASSCODE = 11;
 
 
     // String KEYs for data in bundles RETURNING
@@ -67,12 +67,11 @@ public class HANService extends Service {
     public static final String LOAD_NETWORK_DATA_NETWORK_ADDRESS = "load_network_data_address";
 
     private void saveAppPreferences(){
-        // saves data for the app, data like the last networkData the used, all networks available, and app passcode
+        // saves data for the app, data like the last networkData used, all networks available, and app passcode
         Log.d(TAG, "saving App Preferences");
         Log.d(TAG, "LRU network: " + networkData.getNetworkName());
         Log.d(TAG, "ip: " + networkData.getNetworkAddress());
         Log.d(TAG, "network list: " + networkData.getNetworkList().toString());
-        //networkData.setLastNetworkUsed(networkData.getNetworkName());  // update last used networkData to current networkData
         SharedPreferences sharedPrefs = context.getSharedPreferences(APP_PREFERENCES_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.clear();     // clear existing data before writing
@@ -83,7 +82,7 @@ public class HANService extends Service {
     }
 
     private void saveNetworkPreference(){
-        // saves data to a sharedPreferences file associated with the networkData name. if a file does not exist one is created
+        // saves data for the current network to a sharedPreferences file using the network name. if a file does not exist, one is created
         Log.d(TAG, "saving preferences for " + networkData.getNetworkName() + " network");
         SharedPreferences sharedPrefs = this.getSharedPreferences(networkData.getNetworkName(), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -93,7 +92,7 @@ public class HANService extends Service {
     }
 
     private void readNetworkPreference(String networkName){
-        // reads preferences for a specific network, to get its address
+        // reads preferences for a specific network, to get its associated url
         Log.d(TAG, "reading preferences for " + networkName);
         SharedPreferences sharedPrefs = this.getSharedPreferences(networkName, Context.MODE_PRIVATE);
         String name = sharedPrefs.getString(NETWORK_NAME_KEY, null);
@@ -116,6 +115,7 @@ public class HANService extends Service {
 
     private boolean readAppPreferences(){
         // reads stored data for the app, data like the last network used, all networks available, and app passcode
+        // if there are no networks to load (this is a new user) return false
         boolean haveAccount = false;
         Log.d(TAG, "reading App Preferences");
         SharedPreferences sharedPrefs = this.getSharedPreferences(APP_PREFERENCES_KEY, Context.MODE_PRIVATE);
@@ -140,8 +140,8 @@ public class HANService extends Service {
 
     private void clearAppPreferences(){
         // will erase shared preferences for the app, last used network, network list, and passcode
-        // **** if this clears the network list I will also need to erase all network preferences as well ***
         for(String name : networkData.getNetworkList().toArray(new String[networkData.getNetworkList().size()])){
+            // remove sharedPreferences file for each network in the list
             removeNetworkPreference(name);
         }
         SharedPreferences sharedPrefs = this.getSharedPreferences(APP_PREFERENCES_KEY, Context.MODE_PRIVATE);
@@ -149,30 +149,10 @@ public class HANService extends Service {
         editor.clear();
         editor.commit();
         Log.d(TAG, "All App Preferences removed");
-//        networkData.removeNetworkFromList(network);    // remove this networkData from the list of user's networks
-//
-//        // this is if the user deletes the account they were logged into
-//        if(network.equals(networkData.getNetworkName())) {    // only do this if the user deletes the account they are currently using
-//            unlocked = false;   // this must be set false since it is a class variable, starting a new mobileActivity would
-//            Iterator<String> iterator = networkData.getNetworkList().iterator();
-//            if (iterator.hasNext()) {
-//                networkData.setLastNetworkUsed(iterator.next());
-//                networkData.setNetworkName(networkData.getLastNetworkUsed());  // I do this because saveAppPreferences will assign networkData to lastUsedNetwork and save
-//                Log.d(TAG, "last used networkData is now " + networkData.getLastNetworkUsed());
-//            } else {
-//                networkData.setLastNetworkUsed(null); // change all this data, so if the user leaves the app before logging into another account, it does not keep the data that should be deleted
-//                networkData.setNetworkAddress(null);
-//                networkData.setNetworkName(null);
-//                networkData.setPasscode("-1");
-//            }
-//            newMainActivity();  // force "logout" and have user log in to another account
-//        }
     }
 
     private void updateNetworkData(String newName, String newAddress){
-        // this method is used for updating a network
-//        Log.d(TAG, "Network name: " + networkData.getNetworkName());
-//        Log.d(TAG, "Network Addr: " + networkData.getNetworkAddress());
+        // this method is used for updating a network's data
         removeNetworkPreference(networkData.getNetworkName());      // remove current network
         networkData.removeNetworkFromList(networkData.getNetworkName());    // remove the current network from the list of networks
         networkData.setNetworkName(newName);        // update the current network name
@@ -199,27 +179,13 @@ public class HANService extends Service {
     private boolean validateLogin(String enteredPasscode){
         boolean success = false;
         if(networkData.getPasscode().equals(enteredPasscode)){
-            success = true;     // if the passcodes match set true
+            success = true;     // if the passcodes match, set true
         }
         return success;
     }
-//
-//    private boolean loadMostRecentAccount(){
-//        boolean haveAccount = false;
-//        readAppPreferences();
-//        if(networkData.getNetworkName() != null && !networkData.getNetworkName().equals("")){
-//            // if there was an account to load
-//            readNetworkPreference(networkData.getNetworkName());      // read preferences for the network just set
-//            haveAccount = true;
-//        }
-//        Log.d(TAG, "Network Name: " + networkData.getNetworkName());
-//        Log.d(TAG, "Network Address: " + networkData.getNetworkAddress());
-//        return haveAccount;
-//    }
 
     public void returnJSONDownload(String moduleString){
         Log.d(TAG, "return JSON Downlaod called");
-        // this calls returnModulesToClients because this is the public method and it is the private method
         returnModulesToClients(moduleString);
     }
 
@@ -250,7 +216,7 @@ public class HANService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         // passes binder object back to client
-        Log.d(TAG, "someone bound to HANService");
+        Log.d(TAG, "client binding to HANService");
         return mMessenger.getBinder();
     }
 
@@ -307,26 +273,23 @@ public class HANService extends Service {
                     valuesList.add(0, networkData.getNetworkAddress());     // prepend the ip address to the beginning of the list
                     String[] values = new String[valuesList.size()];
                     values = valuesList.toArray(values);        // pass the array to the array list, the array list converts itself to an array based on the one passed in and also returns a reference to it
-                    new UploadTaskNoProgress().execute(values);
+                    new UploadTaskNoProgressDialog().execute(values);
                     // send upload confirmation
-                    break;
-                case DOWNLOAD_DONE:
-                    Log.d(TAG, "donwload is done");
                     break;
                 case LOAD_APP_DATA:
                     bundle = new Bundle();
                     boolean weHaveAnAccount = readAppPreferences();
                     if(weHaveAnAccount){
                         Log.d(TAG, "loaded " + networkData.getNetworkName() + " network's data");
-                        bundle.putBoolean(LOAD_APP_DATA_RESULT, true);   // no previous account attach false to bundle
+                        bundle.putBoolean(LOAD_APP_DATA_RESULT, true);   // we have previous account, attach true to bundle
                         bundle.putString(LOAD_APP_DATA_NETWORK_NAME, networkData.getNetworkName());   // attach current network name to bundle
                         bundle.putString(LOAD_APP_DATA_NETWORK_ADDRESS, networkData.getNetworkAddress());    // attach current network url
-                        bundle.putStringArrayList(LOAD_APP_DATA_NETWORK_LIST, new ArrayList<String>(Arrays.asList(networkData.getNetworkListArray())));
+                        bundle.putStringArrayList(LOAD_APP_DATA_NETWORK_LIST, new ArrayList<>(Arrays.asList(networkData.getNetworkListArray())));
                     }else{
                         Log.d(TAG, "no recent network to load");
-                        bundle.putBoolean(LOAD_APP_DATA_RESULT, false);  // we have previous account attach true
+                        bundle.putBoolean(LOAD_APP_DATA_RESULT, false);  // no previous account, attach false to bundle
                     }
-                    Message loadMRAreply = Message.obtain(null, ServiceFacade.LOAD_APP_DATA_REPLY);      // setup a message to send result of loading MRA
+                    Message loadMRAreply = Message.obtain(null, ServiceFacade.LOAD_APP_DATA_REPLY);      // setup a message to send result of Load App Data request
                     loadMRAreply.setData(bundle);          // attach login success bundle to message
                     try {
                         msg.replyTo.send(loadMRAreply);
@@ -356,7 +319,7 @@ public class HANService extends Service {
                 case CLEAR_APP_PREFERENCES:
                     clearAppPreferences();      // clear app preferences
                     // no response is sent back at this point
-                    /// *** maybe in the future I should send them back to the new user page
+                    /// *** in the future I will send them back to the new user page
                     break;
                 case UPDATE_CURRENT_NETWORK:
                     bundle = msg.getData();
@@ -405,14 +368,11 @@ public class HANService extends Service {
         context = this;
         hanService = this;
         networkData = new NetworkData();
-        //setupGoogleClientApi();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //mGoogleApiClient.connect();
-        //Wearable.MessageApi.addListener(mGoogleApiClient, new WearEventListener());
-        return START_NOT_STICKY;
+        return START_NOT_STICKY;        // if Android OS kills the service, we dont need to restart it until another call is made
     }
 
     @Override
