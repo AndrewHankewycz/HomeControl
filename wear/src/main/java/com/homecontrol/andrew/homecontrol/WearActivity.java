@@ -214,12 +214,11 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
         }else{
             newState = "0";
         }
-        // this is the way it should be
+
         String values = "[{\"addr\":\"" + module.getAddr()
                 + "\",\"name\":\"" + module.getName()
                 + "\",\"state\":\"" + newState + "\"}]";
-//        String values = "[{\"name\":\"" + module.getName()
-//                + "\",\"state\":\"" + newState + "\",\"" + module.getAddr() + "\"}]";
+
         Log.d(TAG, "sending: " + values);
 
         byte[] sendingBytes = null;
@@ -231,14 +230,6 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
         String theNode = getPrimaryNode();
         Wearable.MessageApi.sendMessage(mGoogleApiClient, theNode, "/start/update_module", sendingBytes);
     };
-
-//    @Override
-//    public void update(Activity activity){
-//        // updates name and state field in database, the only fields that will change with an outlet
-//        String[] values = {"addr", addr, "name", name, "state", state};
-//        new UploadTask(activity).execute(values);
-//    }
-
 
     private void setupGoogleClientApi(){
         mGoogleApiClient = new GoogleApiClient.Builder(activity)

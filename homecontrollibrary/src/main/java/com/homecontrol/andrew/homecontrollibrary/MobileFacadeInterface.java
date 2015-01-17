@@ -11,8 +11,5 @@ public interface MobileFacadeInterface {
     public void promptForLogin();
     public void setCurrentNetworkData(String networkName, String networkUrl);
     public void setNetworkList(ArrayList<String> networkList);
-    public void sendJSONBackToDevice(String moduleString);
     public void refreshCallback();
-    public void createToast(String msg);
-    public void switchToRetryFragment();
 }

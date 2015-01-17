@@ -268,12 +268,8 @@ public class HANService extends Service {
                 case UPLOAD_OP:
                     Log.d(TAG, "doing upload op");
                     bundle = msg.getData();
-                    // make an array list of the values so I can prepend the ip address and convert back to an array
-                    ArrayList<String> valuesList = new ArrayList(Arrays.asList(bundle.getStringArray(ServiceFacade.MODULE_UPLOAD_STRING_KEY)));
-                    valuesList.add(0, networkData.getNetworkAddress());     // prepend the ip address to the beginning of the list
-                    String[] values = new String[valuesList.size()];
-                    values = valuesList.toArray(values);        // pass the array to the array list, the array list converts itself to an array based on the one passed in and also returns a reference to it
-                    new UploadTaskNoProgressDialog().execute(values);
+                    String[] values = bundle.getStringArray(ServiceFacade.MODULE_UPLOAD_STRING_KEY);
+                    new UploadTaskNoProgressDialog(networkData.getNetworkAddress() + getString(R.string.updateModule_ext)).execute(values);
                     // send upload confirmation
                     break;
                 case LOAD_APP_DATA:

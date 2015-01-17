@@ -87,11 +87,17 @@ public class MyGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public int getRowCount() {
-            return mods.size();     // number of rows will be determined by the number of modules
+            return mRows.size();
     }
 
     @Override
     public int getColumnCount(int i) {
-            return mRows.get(i).getColumnCount();
+        int count;
+        if(i < mRows.size()) {
+            count = mRows.get(i).getColumnCount();
+        }else{
+            count = 0;
+        }
+        return count;
     }
 }

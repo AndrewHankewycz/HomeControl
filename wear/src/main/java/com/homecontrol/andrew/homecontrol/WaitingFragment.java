@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 /**
  * Created by andrew on 12/25/14.
+ * Basic fragment that displays a waiting message to the user while waiting for module data from the device to load
  */
 public class WaitingFragment extends CardFragment {
     private static final String TAG = "MyCard";

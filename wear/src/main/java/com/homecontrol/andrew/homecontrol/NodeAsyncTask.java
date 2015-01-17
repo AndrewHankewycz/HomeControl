@@ -12,7 +12,7 @@ import java.util.HashSet;
 
 /**
  * Created by andrew on 12/25/14.
- * Class used to asyncronously get a list of connected "nodes" we can send messages to using the GoogleApiClient
+ * Class used to asynchronously get a list of connected "nodes" we can send messages to using the GoogleApiClient
  */
 public class NodeAsyncTask extends AsyncTask<String, Void, Void> implements MyApiClientInterface{
     private static final String TAG = "Node Async Task";

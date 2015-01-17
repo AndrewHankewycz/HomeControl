@@ -22,12 +22,12 @@ public class ServiceFacade {
     private static ServiceFacade serviceFacade;
     private Context context;
     private static MobileFacadeInterface mobileActivity;
-    private static WearEventListener wearEventListener;
     private Messenger mService;
     final Messenger messengerSelf = new Messenger(new IncomingHandler());   // this is what I will give to services to make callbacks
     private boolean mIsBound;
     private int doingWhat;   // what request from Wear/Mobile we were handling
     private int madeRequest;
+    private HANServiceObserver waitingClient;
 
     private String enteredPasscode;
 
@@ -62,12 +62,9 @@ public class ServiceFacade {
         this.context = ctx;
     }
 
-    public static ServiceFacade getInstance(Context ctx, WearEventListener listener){
+    public static ServiceFacade getInstance(Context ctx){
         if(serviceFacade == null){
             serviceFacade = new ServiceFacade(ctx);
-        }
-        if(wearEventListener == null){
-            wearEventListener = listener;
         }
         return serviceFacade;
     }
@@ -178,8 +175,8 @@ public class ServiceFacade {
         }
     }
 
-    public void getModulesString(int deviceType){
-        madeRequest = deviceType;   // save where the request came from, Mobile or Wear, used for the reply
+    public void getModulesString(HANServiceObserver client){
+        waitingClient = client;   // save the reference to the client for callback
         doingWhat = DOWNLOADING_MODULES;   // set what we are doing, so we can pick up later if needed
         if(!mIsBound) {
             Intent i = new Intent(context, HANService.class);
@@ -370,20 +367,10 @@ public class ServiceFacade {
 
     private void sendModuleDataBackToClient(String moduleString){
         Log.d(TAG, "module string: " + moduleString);
-        if(madeRequest == MOBILE_DEVICE){
-            if(moduleString != null){
-                mobileActivity.sendJSONBackToDevice(moduleString);
-            }else{
-                mobileActivity.createToast("No Response From Server");
-                Log.d(TAG, "no response from server");
-                mobileActivity.switchToRetryFragment();
-            }
-        }else if(madeRequest == WEAR_DEVICE){
-            if(moduleString != null){
-                wearEventListener.sendJSONBackToDevice(moduleString);
-            }else{
-                Log.d(TAG, "no response from server");
-            }
+        if(moduleString != null){
+            waitingClient.receiveJSONFromService(moduleString);
+        }else{
+            waitingClient.notifyRequestFailed();
         }
     }
 

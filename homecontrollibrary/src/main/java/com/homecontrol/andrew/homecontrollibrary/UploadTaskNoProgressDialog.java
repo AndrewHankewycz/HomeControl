@@ -1,6 +1,5 @@
 package com.homecontrol.andrew.homecontrollibrary;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -23,8 +22,10 @@ import java.util.List;
  */
 public class UploadTaskNoProgressDialog extends AsyncTask<String, Void, Void> {
     private static final String TAG = "Upload Task No Progress";
+    private String phpUrl;
 
-    public UploadTaskNoProgressDialog(){
+    public UploadTaskNoProgressDialog(String phpScript){
+        phpUrl = phpScript;
     }
 
     @Override
@@ -53,61 +54,15 @@ public class UploadTaskNoProgressDialog extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... strings) {
         // the string array should always have the addr as the last value
-
-        // do stuff with data................................................
-        // data should be formatted like so, "addr", "column name", "value", "column name", "value"...
-        // address is always first, no need to put the column name
-
-//        // ****** new
-//        OutputStream os = null;
-//        try{
-//            URL url = new URL(activity.getNetworkAddress() + activity.getString(R.string.updateModule_ext));
-//            Log.d(TAG, activity.getNetworkAddress() + activity.getString(R.string.updateModule_ext));
-//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();  // openConnetion() may throw IOException
-//            conn.setConnectTimeout(5000);
-//            conn.setReadTimeout(5000);
-//            conn.setRequestMethod("POST");
-//            conn.setDoOutput(true);
-//            conn.setChunkedStreamingMode(0);
-//
-//            String s = getPost(strings);
-//            Log.d(TAG, s);
-//            os = conn.getOutputStream();
-//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-//            writer.write(s);
-//            conn.connect();
-//            Log.d(TAG, "connected");
-//            int response = conn.getResponseCode();
-//            Log.i(TAG, "The response is " + response);
-//            //is = conn.getInputStream(); // create input stream from http connection
-//            //content = readInput(is);    // read input stream and extract data as string
-//        } catch (MalformedURLException mue){
-//            Log.e(TAG, mue.toString());
-//        } catch (IOException ioe){  // catch IOException of readInput
-//            Log.e(TAG, ioe.toString());
-//        }
-//        finally{
-//            if(os != null) {
-//                try {
-//                    os.close();
-//                } catch (IOException e) {
-//                    Log.e(TAG, activity.getString(R.string.err_close_is));
-//                }
-//            }
-//            return null;    // nothing is read from an input stream so return null
-//        }
-//        // *****new
-
-        String ip = strings[0]; // get ip address, its the first element in the array
         HttpClient httpclient = new DefaultHttpClient();
         HttpParams connParams = httpclient.getParams();
         HttpConnectionParams.setConnectionTimeout(connParams, 5000);    // connection timeout, 5 seconds
         HttpConnectionParams.setSoTimeout(connParams, 5000);    // socket timeout, 5 seconds
-        HttpPost httppost = new HttpPost(ip + "/homeauto/updateModule.php");
+        HttpPost httppost = new HttpPost(phpUrl);
 
         try{
             List dataPairs = new ArrayList();
-            for(int i = 1; i < strings.length; i++) {
+            for(int i = 0; i < strings.length; i++) {
                 dataPairs.add(new BasicNameValuePair(Integer.toString(i), strings[i]));
             }
             httppost.setEntity(new UrlEncodedFormEntity(dataPairs));

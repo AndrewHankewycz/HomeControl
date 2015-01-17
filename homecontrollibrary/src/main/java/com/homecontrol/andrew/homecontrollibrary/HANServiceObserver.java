@@ -6,4 +6,7 @@ package com.homecontrol.andrew.homecontrollibrary;
 public interface HANServiceObserver {
     public static final int GET_MODULES_REPLY = 1;  // callback message for returning module data
     public static final int GET_NETWORK_REPLY = 2;  // callback message for returning network list
+
+    public void receiveJSONFromService(String moduleString);
+    public void notifyRequestFailed();
 }

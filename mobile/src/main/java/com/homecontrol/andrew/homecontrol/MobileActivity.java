@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.homecontrol.andrew.homecontrollibrary.Dimmer;
+import com.homecontrol.andrew.homecontrollibrary.HANServiceObserver;
 import com.homecontrol.andrew.homecontrollibrary.MobileFacadeInterface;
 import com.homecontrol.andrew.homecontrollibrary.ModifyModuleInterface;
 import com.homecontrol.andrew.homecontrollibrary.Module;
@@ -37,11 +38,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class MobileActivity extends ActionBarActivity implements FragmentCommunication, AccountHandler, ModifyModuleInterface, MessageApi.MessageListener, MobileFacadeInterface{
+public class MobileActivity extends ActionBarActivity implements FragmentCommunication, ModifyModuleInterface, MessageApi.MessageListener, MobileFacadeInterface, HANServiceObserver{
     private static final String TAG = "Main Activity";
-    //private static String passcode = "-1";       // I made this static since when the screen rotates, it calls on create of main and fragments. then all these variables are reinitialized
-    // if the user goes into the settings page, the urlAddress and networkName are okay because they are static, but the passcode will be -1. if they make a change, this -1 will then
-    // be saved as the new passcode, locking this account. I should really consider if this variable is even necessary in the class, or if I can just read it from preferences when necessary
     private ArrayList<Module> mods;   // when synced, these will point to the same thing
     private GestureDetectorCompat mDetect;
     private ServiceFacade serviceFacade;
@@ -63,11 +61,12 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
     private static final String NETWORK_ADDRESS_KEY = "network_address";
     private static final String NETWORK_LIST_KEY = "network_list";
     private static final String FRAGMENT_TYPE_KEY = "fragment_type";
-    //************ this method is garbage, but it works for now
-    private static final String LOGIN_FRAG_KEY = "login_fragment";
-    private static final String MAIN_FRAG_KEY = "main_fragment";
-    private static final String SETTINGS_FRAG_KEY = "settings_fragment";
-    private static final String RETRY_FRAG_KEY = "retry_fragment";
+
+    // keys for storing what fragment was active during before Android state changed event
+    private static final int LOGIN_FRAG_KEY = 0;
+    private static final int MAIN_FRAG_KEY = 1;
+    private static final int SETTINGS_FRAG_KEY = 2;
+    private static final int RETRY_FRAG_KEY = 3;
 
     // TAGS for deserialization
     private static final String TAG_ADDR = "addr";
@@ -119,16 +118,24 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
 
             if (savedInstanceState != null) {
                 Log.e(TAG, "returning from previous state");
-                if(savedInstanceState.getString(FRAGMENT_TYPE_KEY).equals(LOGIN_FRAG_KEY)) {
-                    switchToLogin();
-                }else if(savedInstanceState.getString(FRAGMENT_TYPE_KEY).equals(MAIN_FRAG_KEY)){
-                    getNewMainFragment();
-                    switchToMainFragment();
-                }else if (savedInstanceState.getString(FRAGMENT_TYPE_KEY).equals(SETTINGS_FRAG_KEY)){
-                    mainTab = new AccountSettings();
-                }else if(savedInstanceState.getString(FRAGMENT_TYPE_KEY).equals(RETRY_FRAG_KEY)){
-                    retryFragment = new RetryFragment();
-                    switchToRetryFragment();
+                switch (savedInstanceState.getInt(FRAGMENT_TYPE_KEY)) {
+                    case LOGIN_FRAG_KEY:
+                        switchToLogin();
+                        break;
+                    case MAIN_FRAG_KEY:
+                        getNewMainFragment();
+                        switchToMainFragment();
+                        break;
+                    case SETTINGS_FRAG_KEY:
+                        mainTab = new AccountSettings();
+                        break;
+                    case RETRY_FRAG_KEY:
+                        retryFragment = new RetryFragment();
+                        switchToRetryFragment();
+                        break;
+                    default:
+                        // nothing special
+                        break;
                 }
                 return;
             }else{
@@ -262,13 +269,13 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
         outState.putStringArray(NETWORK_LIST_KEY, localNetworkList.toArray(new String[localNetworkList.size()]));
 
         if(mainTab instanceof LoginFragment) {
-            outState.putString(FRAGMENT_TYPE_KEY, LOGIN_FRAG_KEY);
+            outState.putInt(FRAGMENT_TYPE_KEY, LOGIN_FRAG_KEY);
         }else if(mainTab instanceof MainFragment){
-            outState.putString(FRAGMENT_TYPE_KEY, MAIN_FRAG_KEY);
+            outState.putInt(FRAGMENT_TYPE_KEY, MAIN_FRAG_KEY);
         }else if (mainTab instanceof AccountSettings){
-            outState.putString(FRAGMENT_TYPE_KEY, SETTINGS_FRAG_KEY);
+            outState.putInt(FRAGMENT_TYPE_KEY, SETTINGS_FRAG_KEY);
         }else if (mainTab instanceof RetryFragment){
-            outState.putString(FRAGMENT_TYPE_KEY, RETRY_FRAG_KEY);
+            outState.putInt(FRAGMENT_TYPE_KEY, RETRY_FRAG_KEY);
         }
         Log.d(TAG, "state Saved");
     }
@@ -323,7 +330,8 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
 //            Toast.makeText(this, R.string.no_network, Toast.LENGTH_LONG).show();
 //            switchToRetryFragment();
 //        }
-        serviceFacade.getModulesString(ServiceFacade.MOBILE_DEVICE);
+
+        serviceFacade.getModulesString(this);
         // calls method to download module string, the facade will perform a callback to updateButtons
     }
 //
@@ -472,7 +480,6 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
         }
     }
 
-    @Override
     public void switchToRetryFragment(){
         if(retryFragment == null){
             retryFragment = new RetryFragment();
@@ -754,39 +761,16 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
 
     // *** AccountHandler Implementation BEGIN ***
 
-
-
-//    public void saveNetworkPreferences(){
-//        // saves data to a sharedPreferences file associated with the networkData name. if a file does not exist one is created
-////        SharedPreferences sharedPrefs = this.getSharedPreferences(networkData.getNetworkName(), Context.MODE_PRIVATE);
-////        SharedPreferences.Editor editor = sharedPrefs.edit();
-////        editor.putString("urlAddress", networkData.getNetworkAddress());
-////        editor.putString("networkName", networkData.getNetworkName());
-////        editor.putString("passcode", networkData.getPasscode());
-////        editor.commit();
-//        //serviceFacade.updateNetworkPreferences();
-//        Log.i(TAG, "data saved");
-//    }
-
     public void clearAppPreferences(){
         localNetworkName = null;    // clear all local data
         localNetworkAddress = null;
         localNetworkList = null;
         serviceFacade.clearAppPreferences();    // send request to clear all app preferences
     }
-//
-//    @Override
-//    public void renameNetworkPreferences(String newName){
-//        SharedPreferences sharedPrefs = this.getSharedPreferences(networkData.getNetworkName(), Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPrefs.edit();
-//        editor.clear(); // completely remove this shared preference data
-//        editor.commit();
-//        networkData.removeNetworkFromList(networkData.getNetworkName());
-//        networkData.setNetworkName(newName);  // change networkData name
-//        networkData.addNetworkToList(newName);
-//        saveNetworkPreferences();
-//        saveAppPreferences();
-//    }
+
+    public void createToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
 
     // *** MobileFacadeInterface Implementation BEGIN ***
 
@@ -812,7 +796,17 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
     }
 
     @Override
-    public void sendJSONBackToDevice(String moduleString) {
+    public void refreshCallback(){
+        refresh();
+    }
+
+    // *** MobileFacadeInterface Implementation END ***
+
+
+    // *** HANServiceObserver Implementation BEGIN ***
+
+    @Override
+    public void receiveJSONFromService(String moduleString) {
         JSONArray json = null;      // convert string to JSONArray
         try {
             json = new JSONArray(moduleString);
@@ -824,19 +818,13 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
     }
 
     @Override
-    public void refreshCallback(){
-        refresh();
+    public void notifyRequestFailed() {
+        createToast("No Response From Server");
+        Log.d(TAG, "no response from server");
+        switchToRetryFragment();
     }
 
-    @Override
-    public void createToast(String msg){
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    // *** MobileFacadeInterface Implementation END ***
-
-
-    // *** ModifyModule Implementation END ***
+    // *** HANServiceObserver Implementation END ***
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener{
         // with simpleOnGestureListener i only have to implement the events i want to

@@ -1,13 +1,16 @@
 package com.homecontrol.andrew.homecontrollibrary;
 
-import android.app.Activity;
-
 /**
  * Created by andrew on 7/9/14.
  */
 public abstract class Module {
-    public String addr;
-    public String name;
+    private String addr;
+    private String name;
+
+    public Module(String address, String name){
+        addr = address;
+        this.name = name;
+    }
 
     public String getAddr(){
         return addr;
@@ -19,7 +22,7 @@ public abstract class Module {
 
     public void setName(String name){
         this.name = name;
-    };
+    }
 
     public abstract void flipState();
 

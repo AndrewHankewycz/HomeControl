@@ -1,7 +1,5 @@
 package com.homecontrol.andrew.homecontrollibrary;
 
-import android.app.Activity;
-
 /**
  * Created by andrew on 7/9/14.
  *
@@ -10,19 +8,22 @@ import android.app.Activity;
  * I was trying to make the modules update the json array so that when i load buttons from the array they match the changes made
  */
 public class Outlet extends Module {
-    public String TAG = "Outlet";
-    public final static String type = "outlet";
+    private final String TAG = "Outlet";
+    public final static String TYPE = "outlet";
     private String state;
 
     public Outlet(String address, String n, String status){
-        addr = address;
-        name = n;
+        super(address, n);
         state = status;
     }
 
     public Outlet(String address){  // used for creating uninitialized "modules"
-        addr = address;
+        super(address, "New Module");
         state = "0";
+    }
+
+    public String getState(){
+        return state;
     }
 
     @Override
@@ -32,14 +33,10 @@ public class Outlet extends Module {
         else state = "0";
     }
 
-    public String getState(){
-        return state;
-    }
-
     @Override
     public void update(ModifyModuleInterface activity){
         // updates name and state field in database, the only fields that will change with an outlet
-        String[] values = {"name", name, "state", state, addr};
+        String[] values = {"name", getName(), "state", state, getAddr()};
         activity.updateModuleData(values);
     }
 }

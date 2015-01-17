@@ -21,7 +21,7 @@ import java.util.ArrayList;
 /**
  * Created by andrew on 12/27/14.
  */
-public class HANController extends Activity implements HANServiceObserver{
+public class HANController extends Activity{
     private static final String TAG = "HANController";
     private static final String TAG_ADDR = "addr";
     private static final String TAG_NAME = "name";
