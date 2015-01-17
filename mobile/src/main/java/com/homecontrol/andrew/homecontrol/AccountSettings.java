@@ -29,7 +29,6 @@ public class AccountSettings extends Fragment {
     MobileActivity activity;
     boolean passcodeVisible = false;
 
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -39,6 +38,7 @@ public class AccountSettings extends Fragment {
             throw new ClassCastException(activity.toString() + " must be of type MobileActivity");
         }
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View accountSettingsView = inflater.inflate(R.layout.account_settings, container, false);
@@ -126,7 +126,7 @@ public class AccountSettings extends Fragment {
                 passcodeConfirm = confirmPasscode.getText().toString();
                 try {
                     ip = IPHelper.validateIP(ip);
-                    checkPasscode(passcode, passcodeConfirm);   // check if passwords match first
+                    PasscodeHelper.checkPasscode(passcode, passcodeConfirm);   // check if passwords match first
                     activity.setAccountData(passcode);
                     if(!activity.getNetworkName().equals(network) || !activity.getNetworkAddress().equals(ip)) {
                         // if either the network name or ip has changed
@@ -199,19 +199,6 @@ public class AccountSettings extends Fragment {
             }
         }
     };
-
-    private void checkPasscode(String pc1, String pc2) throws InvalidPasscodeException{
-        if(!pc1.equals(pc2))
-            throw new InvalidPasscodeException("the passcodes do not match");
-        if(pc1.matches("\\[0-9]+") && pc1.length() >= 4)
-            throw new InvalidPasscodeException("that is an invalid passcode");
-    }
-
-    private class InvalidPasscodeException extends Exception {
-        public InvalidPasscodeException(String s){
-            super(s);
-        }
-    }
 
     private class RestoreConfirmDialog2 extends DialogFragment {
         private final String TAG = "Restore Confirm Dialog";

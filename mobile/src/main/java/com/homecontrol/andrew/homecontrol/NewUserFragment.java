@@ -76,7 +76,7 @@ public class NewUserFragment extends Fragment {
                 passcodeConfirm = confirmPasscode.getText().toString();
                 try {
                     ip = IPHelper.validateIP(ip);
-                    checkPasscode(passcode, passcodeConfirm);
+                    PasscodeHelper.checkPasscode(passcode, passcodeConfirm);
                     Log.e(TAG, network + " " + ip);
                     activity.setAccountData(passcode);
                     activity.makeNewNetwork(network, ip);       // creates a new network
@@ -119,21 +119,4 @@ public class NewUserFragment extends Fragment {
             }*/
         }
     };
-
-    private void checkPasscode(String pc1, String pc2) throws InvalidPasscodeException{
-        if(!pc1.equals(pc2)) {
-            throw new InvalidPasscodeException("the passcodes do not match");
-        }
-        if(pc1.matches("\\[0-9]+") && pc1.length() >= 4) {
-            String s = pc1 + " " + pc2;
-            Log.d(TAG, s);
-            throw new InvalidPasscodeException("that is an invalid passcode");
-        }
-    }
-
-    private class InvalidPasscodeException extends Exception {
-        public InvalidPasscodeException(String s){
-            super(s);
-        }
-    }
 }
