@@ -125,7 +125,7 @@ public class AccountSettings extends Fragment {
                 passcode = newPasscode.getText().toString();
                 passcodeConfirm = confirmPasscode.getText().toString();
                 try {
-                    ip = checkIP(ip);
+                    ip = IPHelper.validateIP(ip);
                     checkPasscode(passcode, passcodeConfirm);   // check if passwords match first
                     activity.setAccountData(passcode);
                     if(!activity.getNetworkName().equals(network) || !activity.getNetworkAddress().equals(ip)) {
@@ -205,31 +205,6 @@ public class AccountSettings extends Fragment {
             throw new InvalidPasscodeException("the passcodes do not match");
         if(pc1.matches("\\[0-9]+") && pc1.length() >= 4)
             throw new InvalidPasscodeException("that is an invalid passcode");
-    }
-
-    private String checkIP(String ip) throws IllegalIpAddressException{
-        String finalIp = null;
-        if(ip.matches("http://" + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}")) // submitted http://111.111.111.111
-            finalIp = ip;
-        else if(ip.matches("http://" + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + ':' + "\\d{1,4}")) // submitted http://111.111.111.111:8080
-            finalIp = ip;
-        else if(ip.matches("https://" + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}")) // submitted http://111.111.111.111
-            finalIp = ip;
-        else if(ip.matches("https://" + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + ':' + "\\d{1,4}")) // submitted http://111.111.111.111:8080
-            finalIp = ip;
-        else if(ip.matches("\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}"))    /// submitted 111.111.111.111
-            finalIp = "http://" + ip;
-        else if(ip.matches("\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + ':' + "\\d{1,4}")) // submitted 111.111.111.111:8080
-            finalIp = "http://" + ip;
-        else
-            throw new IllegalIpAddressException("Illegal IP Address found");
-        return finalIp;
-    }
-
-    private class IllegalIpAddressException extends Exception{
-        public IllegalIpAddressException(String s){
-            super(s);
-        }
     }
 
     private class InvalidPasscodeException extends Exception {

@@ -18,7 +18,6 @@ public class NewModuleDialog extends DialogFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
     }
 
     @Override
@@ -27,12 +26,15 @@ public class NewModuleDialog extends DialogFragment {
         type = getArguments().getStringArray("type");
         addr = getArguments().getStringArray("addr");
         String[] displayedNames = new String[type.length];
-        for(int i = 0; i < type.length; i++){
+        for(int i = 0; i < type.length; i++) {
+            String name = "";
             if(type[i].equals("outlet")) {     // have to use if because of lowercase outlet in database
-                displayedNames[i] = "Type : Outlet" + "\t\t Unique Address : " + addr[i];
-            } else if(type[i].equals("dimmer")){
-                displayedNames[i] = "Type : Dimmer" + "\t\t Unique Address : " + addr[i];
-            } else displayedNames[i] = "Type : Unknown" + "\t\t Unique Address : " + addr[i];
+                name = "Outlet";
+            } else if(type[i].equals("dimmer")) {
+                name = "Dimmer";
+            } else name = "Unknown";
+
+            displayNames[i] = generateDisplayName(name, addr[i]);
         }
 
         // Use the Builder class for convenient dialog construction
@@ -46,6 +48,10 @@ public class NewModuleDialog extends DialogFragment {
                 });
         // Create the AlertDialog object and return it
         return builder.create();
+    }
+
+    private String generateDisplayName(String type, String address) {
+        return "Type : " + type + "\t\t Unique Address : " + address;
     }
 
     private final class onClickListener implements DialogInterface.OnClickListener {

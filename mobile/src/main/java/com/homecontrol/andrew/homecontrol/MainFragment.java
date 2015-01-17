@@ -338,14 +338,14 @@ public class MainFragment extends Fragment implements DownloadJSONUninits.NewMod
             module = list.get(i);
             if (module instanceof Outlet) {
                 type[i] = "outlet"; // set string array value, for displaying in the dialog window
-                addr[i] = module.getAddr();  // set addr string value, for displaying in dialog window
             } else if(module instanceof Dimmer) {
                 type[i] = "dimmer";
-                addr[i] = module.getAddr();
             } else {
                 type[i] = "Unknown";
-                addr[i] = module.getAddr();
             }
+
+            // set addr string value, for displaying in dialog window
+            addr[i] = module.getAddr();
         }
         Bundle bundle = new Bundle();
         bundle.putStringArray("type", type);
