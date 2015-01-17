@@ -80,131 +80,83 @@ public class ServiceFacade {
     public void loadAppData(int deviceType){
         doingWhat = LOADING_APP_DATA;   // set what we are doing, so we can pick up later if needed
         madeRequest = deviceType;       // not really sure this is needed. I dont think the watch will ever make this request
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
-           sendLoadAppDataMsg();     // we have a binder, call this method to request HANService to load last used network data
-            // this will respond if there was an account or not
-        }
+        if(isBound())
+           sendLoadAppDataMsg();        // we have a binder, call this method to request HANService to load last used network data
+                                        // this will respond if there was an account or not
     }
 
     public void loadNetworkData(String networkName, int deviceType){
         doingWhat = LOADING_NETWORK_DATA;   // set what we are doing, so we can pick up later if needed
         madeRequest = deviceType;
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
+        if(isBound())
             sendLoadNetworkDataMsg(networkName);     // we have a binder, call this method to request HANService to load a different network's data
-            // this will respond with the network name and url
-        }
+                                                     // this will respond with the network name and url
     }
 
     public void saveAppData(){
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
-            sendSaveAppDataMsg();     // we have a binder, call this method to request HANService to load last used network data
-            // saves app data, last network used...
-        }
+        if(isBound())
+            sendSaveAppDataMsg();       // we have a binder, call this method to request HANService to load last used network data
+                                        // saves app data, last network used...
     }
 
     public void clearAppPreferences(){
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
-            sendClearAppPreferences();     // we have a binder, call this method to request HANService to clear all app preferences
-            // future plans will send a response back for the NewUserFragment
-        }
+        if(isBound())
+            sendClearAppPreferences();      // we have a binder, call this method to request HANService to clear all app preferences
+                                            // future plans will send a response back for the NewUserFragment
     }
 
     public void saveNetwork(){
         // saves the network preferences for the current network
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
-            sendSaveNetworkMsg();     // we have a binder, call this method to save the current networks preference
-        }
-        // no response is sent back
+        if(isBound())
+            sendSaveNetworkMsg();           // we have a binder, call this method to save the current networks preference
+                                            // no response is sent back
     }
 
     public void removeNetwork(String networkToRemove){
         // sends message to HANService to remove the specified network preferences
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
-            sendRemoveNetworkMsg(networkToRemove);     // we have a binder, call this method to remove the specified network preference
-        }
-        // doesnt get a response from HANService
+        if(isBound())
+            sendRemoveNetworkMsg(networkToRemove);      // we have a binder, call this method to remove the specified network preference
+                                                        // doesnt get a response from HANService
     }
 
     public void validateLogin(String enteredPasscode){
-        doingWhat = VALIDATING_LOGIN;   // set what we are doing, so we can pick up later if needed
-        this.enteredPasscode = enteredPasscode;     // set the enteredPasscode, in case we have to start the service and look for it later
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
-            sendValidateLoginMsg(enteredPasscode);     // we have a binder, call this method to send the message to the HANService
-        }
-        // response is sent back, if the login is successful of not
+        doingWhat = VALIDATING_LOGIN;                   // set what we are doing, so we can pick up later if needed
+        this.enteredPasscode = enteredPasscode;         // set the enteredPasscode, in case we have to start the service and look for it later
+        if(isBound())
+            sendValidateLoginMsg(enteredPasscode);      // we have a binder, call this method to send the message to the HANService
+                                                        // response is sent back, if the login is successful of not
     }
 
     public void updateNetworkData(String networkName, String networkAddress){
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
+        if(isBound())
             sendUpdateNetworkMsg(networkName, networkAddress);     // we have a binder, call this method to update the current networks data
-        }
-        // doesnt wait for response from HANService
+                                                                   // doesnt wait for response from HANService
     }
 
     public void createNewNetwork(String networkName, String networkAddress){
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else {
+        if(isBound())
             sendNewNetworkMsg(networkName, networkAddress);     // we have a binder, call this method to create a new network
-            // doesnt wait for response from HANService
-        }
+                                                                 // doesnt wait for response from HANService
     }
 
     public void getModulesString(HANServiceObserver client){
-        waitingClient = client;   // save the reference to the client for callback
-        doingWhat = DOWNLOADING_MODULES;   // set what we are doing, so we can pick up later if needed
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
-            sendDownloadModulesMsg();     // we have a binder, call this method to send the message to the HANService to download modules
-        }
-        // expects a reply from the HANService
+        waitingClient = client;             // save the reference to the client for callback
+        doingWhat = DOWNLOADING_MODULES;    // set what we are doing, so we can pick up later if needed
+        if(isBound())
+            sendDownloadModulesMsg();       // we have a binder, call this method to send the message to the HANService to download modules
+                                            // expects a reply from the HANService
     }
 
     public void modifyModuleData(String[] valuesArray){
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
+        if(isBound())
             sendModifyModuleDataMsg(valuesArray);     // we have a binder, call this method to send the message to the HANService to upload the module changes
-        }
-        // no reply expected
+                                                      // no reply expected
     }
 
     public void setAccountPasscode(String enteredPasscode){
-        if(!mIsBound) {
-            Intent i = new Intent(context, HANService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        }else{
+        if(isBound())
             sendSetPasscodeMsg(enteredPasscode);     // we have a binder, call this method to send the app passcode
-        }
-        // no reply expected
+                                                     // no reply expected
     }
 
     private void sendLoadAppDataMsg(){
@@ -390,6 +342,15 @@ public class ServiceFacade {
 
             // ****** i think i should handle this ****
         }
+    }
+
+    private boolean isBound() {
+        if(!mIsBound) {
+            Intent i = new Intent(context, HANService.class);
+            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+            return false;
+        }
+        return true;
     }
 
     // for handling IPC messages from HANServer

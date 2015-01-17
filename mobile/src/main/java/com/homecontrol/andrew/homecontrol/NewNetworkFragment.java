@@ -68,7 +68,7 @@ public class NewNetworkFragment extends Fragment {
 
             try {
                 if(checkNetwork(network)) {
-                    ip = checkIP(ip);
+                    ip = IPHelper.validateIP(ip);
                     Log.e(TAG, network + " " + ip);
                     activity.makeNewNetwork(network, ip);       // creates a new network
                     activity.getNewMainFragment();
@@ -87,21 +87,6 @@ public class NewNetworkFragment extends Fragment {
         }
     };
 
-    private String checkIP(String ip) throws IllegalIpAddressException{
-        String finalIp = null;
-        if(ip.matches("http://" + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}")) // submitted http://111.111.111.111
-            finalIp = ip;
-        else if(ip.matches("http://" + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + ':' + "\\d{1,4}")) // submitted http://111.111.111.111:8080
-            finalIp = ip;
-        else if(ip.matches("\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}"))    /// submitted 111.111.111.111
-            finalIp = "http://" + ip;
-        else if(ip.matches("\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + ':' + "\\d{1,4}")) // submitted http://111.111.111.111:8080
-            finalIp = "http://" + ip;
-        else
-            throw new IllegalIpAddressException("Illegal IP Address found");
-        return finalIp;
-    }
-
     private boolean checkNetwork(String network){
         boolean success = true;
         // loop over each network in the list checking if any of them match the new network name
@@ -111,11 +96,5 @@ public class NewNetworkFragment extends Fragment {
             }
         }
         return success;
-    }
-
-    private class IllegalIpAddressException extends Exception{
-        public IllegalIpAddressException(String s){
-            super(s);
-        }
     }
 }

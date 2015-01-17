@@ -75,8 +75,8 @@ public class NewUserFragment extends Fragment {
                 passcode = newPasscode.getText().toString();
                 passcodeConfirm = confirmPasscode.getText().toString();
                 try {
-                    ip = checkIP(ip);
-                    checkPasscode(passcode, passcodeConfirm);
+                    ip = IPHelper.validateIP(ip);
+                    PasscodeHelper.checkPasscode(passcode, passcodeConfirm);
                     Log.e(TAG, network + " " + ip);
                     activity.setAccountData(passcode);
                     activity.makeNewNetwork(network, ip);       // creates a new network
@@ -119,42 +119,4 @@ public class NewUserFragment extends Fragment {
             }*/
         }
     };
-
-    private void checkPasscode(String pc1, String pc2) throws InvalidPasscodeException{
-        if(!pc1.equals(pc2)) {
-            throw new InvalidPasscodeException("the passcodes do not match");
-        }
-        if(pc1.matches("\\[0-9]+") && pc1.length() >= 4) {
-            String s = pc1 + " " + pc2;
-            Log.d(TAG, s);
-            throw new InvalidPasscodeException("that is an invalid passcode");
-        }
-    }
-
-    private String checkIP(String ip) throws IllegalIpAddressException{
-        String finalIp = null;
-        if(ip.matches("http://" + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}")) // submitted http://111.111.111.111
-            finalIp = ip;
-        else if(ip.matches("http://" + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + ':' + "\\d{1,4}")) // submitted http://111.111.111.111:8080
-            finalIp = ip;
-        else if(ip.matches("\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}"))    /// submitted 111.111.111.111
-            finalIp = "http://" + ip;
-        else if(ip.matches("\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + '.' + "\\d{1,3}" + ':' + "\\d{1,4}")) // submitted http://111.111.111.111:8080
-            finalIp = "http://" + ip;
-        else
-            throw new IllegalIpAddressException("Illegal IP Address found");
-        return finalIp;
-    }
-
-    private class IllegalIpAddressException extends Exception{
-        public IllegalIpAddressException(String s){
-            super(s);
-        }
-    }
-
-    private class InvalidPasscodeException extends Exception {
-        public InvalidPasscodeException(String s){
-            super(s);
-        }
-    }
 }

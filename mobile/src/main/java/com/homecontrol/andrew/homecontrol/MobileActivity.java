@@ -483,10 +483,9 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
     public void switchToRetryFragment(){
         if(retryFragment == null){
             retryFragment = new RetryFragment();
-            mainTab = retryFragment;
-        }else {
-            mainTab = retryFragment;
         }
+
+        mainTab = retryFragment;
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, mainTab).commit();
     }
