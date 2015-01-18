@@ -40,7 +40,7 @@ import java.util.Iterator;
 
 public class MobileActivity extends ActionBarActivity implements FragmentCommunication, ModifyModuleInterface, MessageApi.MessageListener, MobileFacadeInterface, HANServiceObserver{
     private static final String TAG = "Main Activity";
-    private ArrayList<Module> mods;   // when synced, these will point to the same thing
+    private ArrayList<Module> mods;
     private GestureDetectorCompat mDetect;
     private ServiceFacade serviceFacade;
 
@@ -531,7 +531,7 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
     }
 
 
-    ////// ********* getting network data from service ******8
+    ////// ********* getting network data from service ******
 
     public void returnLoginResult(boolean success){
         if(success) {
@@ -641,6 +641,14 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
         }
     }
 
+    @Override
+    public void renameModule(int index, String newName){
+        Module m = mods.get(index);
+        m.setName(newName);
+        m.update(this);
+        updateButtons();
+    }
+
 
     ////  ******** need to be updated to use service ****
     private void updateModuleByAddr(String... strings){
@@ -661,11 +669,6 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
             addModuleByAddr(addr);
             refresh();
         }
-    }
-
-    public void renameModule(String addr,String name){
-        String[] s = {"name", name, "addr", addr};
-        updateModuleByAddr(s);
     }
 
     public void removeModule(String table, String addr){
@@ -699,7 +702,7 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
 
 
 
-    ////////// **************** these have been partly deprecated by service ********888
+    ////////// **************** these have been partly deprecated by service ********
 //    public void saveAppPreferences(){
 //        // saves data for the app, data like the last networkData the user was using....
 ////        Log.d(TAG, "saving App Preferences");
@@ -729,25 +732,18 @@ public class MobileActivity extends ActionBarActivity implements FragmentCommuni
         // this method verifies if the user is entering the correct passcode associated with their account
         Log.d(TAG, "validating login");
         serviceFacade.validateLogin(enteredPasscode);   // send request to Service to validate login
-//        SharedPreferences sharedPrefs = this.getSharedPreferences(networkData.getNetworkName(), Context.MODE_PRIVATE);
-//        Map<String, ?> allEntries = sharedPrefs.getAll();
-//        Log.i(TAG, "Saved passcode : " + networkData.getPasscode());
-//        Log.i(TAG, "Entered passcode : " + enteredPasscode);
-//        if(networkData.getPasscode().equals(enteredPasscode))
-//            return true;
-//        else return false;
     }
 
 
 
     // *** FragmentCommunication Implementation BEGIN ***
 
-    @Override   // override method of interface FragmentCommunication
-    public void syncModuleArrays(ArrayList list){
-        // i might want to make this a deep copy
-        mods = list;
-        Log.d(TAG, "modules have been synced");
-    }
+//    @Override   // override method of interface FragmentCommunication
+//    public void syncModuleArrays(ArrayList list){
+//        // i might want to make this a deep copy
+//        mods = list;
+//        Log.d(TAG, "modules have been synced");
+//    }
 
     @Override
     public void newMainActivity(){

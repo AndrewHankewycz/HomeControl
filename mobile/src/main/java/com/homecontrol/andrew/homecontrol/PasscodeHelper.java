@@ -1,6 +1,10 @@
 package com.homecontrol.andrew.homecontrol;
 
+import android.util.Log;
+
 public class PasscodeHelper {
+    private static final String TAG = "PasscodeHelper";
+
     public static void checkPasscode(String pc1, String pc2) throws InvalidPasscodeException{
         if(!pc1.equals(pc2)) {
             throw new InvalidPasscodeException("The passcodes do not match");

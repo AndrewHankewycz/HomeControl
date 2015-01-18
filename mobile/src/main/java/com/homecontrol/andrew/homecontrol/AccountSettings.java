@@ -102,7 +102,7 @@ public class AccountSettings extends Fragment {
             if(newPasscode.getText().toString().equals("") && confirmPasscode.getText().toString().equals("")){  // when both passcodes are blank, dont change passcode
                 Log.d(TAG, "not changing passcode");
                 try {
-                    ip = checkIP(ip);
+                    ip = IPHelper.validateIP(ip);
                     if(!activity.getNetworkName().equals(network) || !activity.getNetworkAddress().equals(ip)) {
                         // if either the network name or ip has changed
                         activity.setNetworkData(network, ip);      // set the network name and address, if either has changed the activity will take care of updates

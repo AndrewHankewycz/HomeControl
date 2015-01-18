@@ -34,6 +34,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.microedition.khronos.egl.EGLDisplay;
+
 /**
  * Created by andrew on 7/15/14.
  */
@@ -47,12 +49,10 @@ public class MainFragment extends Fragment implements DownloadJSONUninits.NewMod
     private ArrayList<String> networkList;
     private int selectedPos;
     JSONArray jsonArray;    // where we will store the jsonArray, others will point to this
-    //private Module modules[];
-    //ArrayList<Module> mods;
     ArrayList<Module> uninitMods;
     //private GestureDetectorCompat mDetect;
 
-    MobileActivity activity;  // so I dont have to keep calling getActivity(), also if I assign during onAttach I know I have the pointer
+    MobileActivity activity;
 
     @Override
     public void onAttach(Activity activity) {
@@ -195,9 +195,6 @@ public class MainFragment extends Fragment implements DownloadJSONUninits.NewMod
             case R.id.action_settings: {
                 Log.d(TAG, "pressed menu settings button");
                 activity.switchToAccountSettingsFragment();
-//                AccountSettings frag = new AccountSettings();
-//                frag.setArguments(activity.getIntent().getExtras());
-//                activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, frag).addToBackStack(null).commit();
                 return true;
             }
             default:
@@ -231,11 +228,12 @@ public class MainFragment extends Fragment implements DownloadJSONUninits.NewMod
                     Log.d(TAG, "long clicked button " + position);
                     Module module = mods.get(position);
                     Bundle bundle = new Bundle();
-                    bundle.putString("name", ((Module) mods.get(position)).getName());
-                    bundle.putString("addr", ((Module) mods.get(position)).getAddr());
+                    bundle.putString(EditModuleDialog.MODULE_NAME, ((Module) mods.get(position)).getName());
+                    bundle.putString(EditModuleDialog.MODULE_ADDR, ((Module) mods.get(position)).getAddr());
+                    bundle.putInt(EditModuleDialog.MODULE_LIST_INDEX, position);
                     if (module instanceof Outlet)
-                        bundle.putString("type", "Outlet");
-                    else bundle.putString("type", "Unknown");
+                        bundle.putString(EditModuleDialog.MODULE_TYPE, "Outlet");
+                    else bundle.putString(EditModuleDialog.MODULE_TYPE, "Unknown");
                     DialogFragment dialog = new EditModuleDialog();
                     dialog.setArguments(bundle);
                     dialog.show(activity.getSupportFragmentManager(), "My edit module dialog");
@@ -348,8 +346,8 @@ public class MainFragment extends Fragment implements DownloadJSONUninits.NewMod
             addr[i] = module.getAddr();
         }
         Bundle bundle = new Bundle();
-        bundle.putStringArray("type", type);
-        bundle.putStringArray("addr", addr);
+        bundle.putStringArray(EditModuleDialog.MODULE_TYPE, type);
+        bundle.putStringArray(EditModuleDialog.MODULE_ADDR, addr);
         return bundle;
     }
 
@@ -371,11 +369,9 @@ public class MainFragment extends Fragment implements DownloadJSONUninits.NewMod
                     uninitMods.add(new Outlet(jsonObject.getString(TAG_ADDR)));
                 } else if(type.equals("dimmer")){
                     uninitMods.add(new Dimmer(jsonObject.getString(TAG_ADDR)));
-                } else if(type.equals("temp_outlet")) {
-                    // new temp_outlet
-                    uninitMods.add(new Outlet(jsonObject.getString(TAG_ADDR)));   // doing it anyway for now since i dont have a temp
-                } else
+                } else {
                     throw new IllegalArgumentException("Invalid module type found");
+                }
             }
             Log.d(TAG, "deserialized");
         } catch (JSONException je){

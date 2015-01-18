@@ -11,7 +11,7 @@ import android.support.v4.app.DialogFragment;
  * Created by andrew on 7/21/14.
  */
 public class NewModuleDialog extends DialogFragment {
-    private static String TAG = "New Module Dialog";
+    private static final String TAG = "New Module Dialog";
     String[] type;
     String[] addr;
 
@@ -34,7 +34,7 @@ public class NewModuleDialog extends DialogFragment {
                 name = "Dimmer";
             } else name = "Unknown";
 
-            displayNames[i] = generateDisplayName(name, addr[i]);
+            displayedNames[i] = generateDisplayName(name, addr[i]);
         }
 
         // Use the Builder class for convenient dialog construction

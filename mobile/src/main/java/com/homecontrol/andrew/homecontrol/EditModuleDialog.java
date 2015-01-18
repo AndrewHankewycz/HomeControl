@@ -15,24 +15,33 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.homecontrol.andrew.homecontrollibrary.ModifyModuleInterface;
+
 /**
  * Created by andrew on 7/30/14.
  */
 public class EditModuleDialog extends DialogFragment {
     private static String TAG = "Edit Module Dialog";
-    MobileActivity activity;
-    String name;
-    String addr;
-    String type;
+    private ModifyModuleInterface activity;
+    private String name;
+    private String addr;
+    private String type;
+    private int index;
+
+    // keys for attaching module data to bundle
+    public static final String MODULE_ADDR = "addr";
+    public static final String MODULE_NAME = "name";
+    public static final String MODULE_TYPE = "type";
+    public static final String MODULE_LIST_INDEX = "list_index";
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            this.activity = (MobileActivity) activity;
+            this.activity = (ModifyModuleInterface) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " mobileActivity must be of type MobileActivity");
+                    + " activity must implement ModifyModuleInterface");
         }
     }
 
@@ -40,9 +49,10 @@ public class EditModuleDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         Log.d(TAG, "onCreateDialog");
-        name = getArguments().getString("name");
-        type = getArguments().getString("type");
-        addr = getArguments().getString("addr");
+        name = getArguments().getString(MODULE_NAME);
+        type = getArguments().getString(MODULE_TYPE);
+        addr = getArguments().getString(MODULE_ADDR);
+        index = getArguments().getInt(MODULE_LIST_INDEX);
 
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -61,7 +71,7 @@ public class EditModuleDialog extends DialogFragment {
                 // for when the user presses the keyboard Done button
                 boolean handled = false;
                 if(i == EditorInfo.IME_ACTION_DONE){
-                    submit(textView.getText().toString());  // validate input and proceed
+                    submit(i, textView.getText().toString());  // validate input and proceed
                     handled = true;
                 }
                 return handled;
@@ -77,14 +87,13 @@ public class EditModuleDialog extends DialogFragment {
         return builder.create();
     }
 
-    private void submit(String name){
+    private void submit(int index, String name){
         if(name.equals(""))
             Toast.makeText(getActivity(), "Module must have a name", Toast.LENGTH_SHORT).show();
         else if(name.length() > 20)
             Toast.makeText(getActivity(), "Please use a shorter name", Toast.LENGTH_SHORT).show();
         else {
-            activity.renameModule(addr, name);   // somehow i need ot identify what module i am renaming
-            activity.refresh();
+            activity.renameModule(index, name);   // somehow i need ot identify what module i am renaming
             getDialog().dismiss();
         }
     }
@@ -93,7 +102,7 @@ public class EditModuleDialog extends DialogFragment {
         public void onClick(DialogInterface dialog, int which) {
             EditText nameText = (EditText) ((AlertDialog)dialog).findViewById(R.id.edit_mod_dialog_name_edittext);
             String name = nameText.getText().toString();
-            submit(name);   // validate input and proceed
+            submit(index, name);   // validate input and proceed
         }
     }
 
