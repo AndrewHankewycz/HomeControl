@@ -21,7 +21,6 @@ public class ModuleCardFragment extends Fragment {
     private WearActivity activity;
     private ArrayList<Module> mods;
 
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

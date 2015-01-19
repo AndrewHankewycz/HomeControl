@@ -49,6 +49,7 @@ public class EventCard extends CardFragment {
 
         TextView cardText = (TextView) view.findViewById(R.id.outlet_text);
         ImageButton button = (ImageButton) view.findViewById(R.id.outlet_button);
+
         if(state.equals("1")){
             cardText.setText(getString(R.string.turn_off_label));
             button.setImageDrawable(getResources().getDrawable(R.drawable.light_bulb_white_off));
@@ -73,5 +74,7 @@ public class EventCard extends CardFragment {
                 activity.finish();      // end the activity, close the program
             }
         });
-        return view;    }
+
+        return view;
+    }
 }

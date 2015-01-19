@@ -62,5 +62,7 @@ public class MyCard extends CardFragment {
                 return false;
             }
         });
-        return view;    }
+
+        return view;
+    }
 }
