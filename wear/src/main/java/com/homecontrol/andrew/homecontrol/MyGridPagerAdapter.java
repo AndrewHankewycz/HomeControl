@@ -33,8 +33,8 @@ public class MyGridPagerAdapter extends FragmentGridPagerAdapter {
 
     private void createPage(){
         Log.d(TAG, "creating page");
-        mRows = new ArrayList<MyGridPagerAdapter.Row>();        // clear rows if there was any old data
-        Module tempMod = null;
+        mRows = new ArrayList<>(); // clear rows if there was any old data
+        Module tempMod;
 
         for(int i = 0; i < mods.size(); i++){
             tempMod = mods.get(i);      // get reference to the current module
@@ -92,12 +92,9 @@ public class MyGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public int getColumnCount(int i) {
-        int count;
         if(i < mRows.size()) {
-            count = mRows.get(i).getColumnCount();
-        }else{
-            count = 0;
+            return mRows.get(i).getColumnCount();
         }
-        return count;
+        return 0;
     }
 }

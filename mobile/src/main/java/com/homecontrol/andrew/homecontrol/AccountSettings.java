@@ -184,19 +184,12 @@ public class AccountSettings extends Fragment {
     public View.OnClickListener down = new View.OnClickListener(){
         @Override
         public void onClick(View view){
-            if(!passcodeVisible) {
-                passcodeVisible = true;
-                LinearLayout passcodeLayout = (LinearLayout) activity.findViewById(R.id.passcode_layout);
-                passcodeLayout.setVisibility(View.VISIBLE);
-                Button arrow = (Button) activity.findViewById(R.id.dropdown);
-                arrow.setBackgroundResource(R.drawable.expander_right);
-            }else {
-                passcodeVisible = false;
-                LinearLayout passcodeLayout = (LinearLayout) activity.findViewById(R.id.passcode_layout);
-                passcodeLayout.setVisibility(View.GONE);
-                Button arrow = (Button) activity.findViewById(R.id.dropdown);
-                arrow.setBackgroundResource(R.drawable.expander_down);
-            }
+        passcodeVisible = !passcodeVisible;
+
+        LinearLayout passcodeLayout = (LinearLayout) activity.findViewById(R.id.passcode_layout);
+        passcodeLayout.setVisibility(passcodeVisible ? View.VISIBLE : View.GONE);
+        Button arrow = (Button) activity.findViewById(R.id.dropdown);
+        arrow.setBackgroundResource(R.drawable.expander_right);
         }
     };
 

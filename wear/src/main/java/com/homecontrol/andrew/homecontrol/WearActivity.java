@@ -44,15 +44,13 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
         deserialize(json);
     }
 
-
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        Log.e(TAG, "Got the MESSAGE!!!!!!!!");
         String eventPath = messageEvent.getPath();
         Log.d(TAG, eventPath);
         if(eventPath.equals(SERVER_DOWNLOAD_REPLY)){
             byte[] b = messageEvent.getData();
-            String hiddenMsg = null;
+            String hiddenMsg;
             try {
                 hiddenMsg = new String(b, "UTF-8");
                 Log.d(TAG, hiddenMsg);
@@ -207,13 +205,12 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
         list.add("value");
         list.add(module.getState());
 //        String test = "[{\"addr\":\"0012,02,7558\",\"name\":\"Outside Lights\",\"value\":\"0\"}]";
-        String newState = "";
+        String newState = "0";
         if(module.getState().equals("1")){
             newState = "1";
-        }else{
-            newState = "0";
         }
 
+        //TODO: Use org.json.JSONObject instead
         String values = "[{\"addr\":\"" + module.getAddr()
                 + "\",\"name\":\"" + module.getName()
                 + "\",\"state\":\"" + newState + "\"}]";
