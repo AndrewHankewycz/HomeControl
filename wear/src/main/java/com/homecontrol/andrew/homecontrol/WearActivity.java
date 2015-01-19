@@ -145,14 +145,13 @@ public class WearActivity extends Activity implements MessageApi.MessageListener
     }
 
     private String getPrimaryNode(){
-        String node = nodesList.iterator().next();  // get node from list
-        return node;
+        return nodesList.iterator().next();
     }
 
     public void deserialize(JSONArray jsonArray){
-        mods = new ArrayList<Module>();
+        mods = new ArrayList<>();
         JSONObject jsonObject;
-        String type, name;
+        String type;
 
         try {
             for (int i = 0; i < jsonArray.length(); i++) {
