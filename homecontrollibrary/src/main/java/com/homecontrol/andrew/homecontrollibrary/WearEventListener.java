@@ -100,7 +100,7 @@ public class WearEventListener extends WearableListenerService implements MyApiC
             updateValues.add(name);
             updateValues.add("state");
             updateValues.add(value);
-//            updateValues.add("addr");
+            updateValues.add("addr");
             updateValues.add(addr);
             Log.d(TAG, "updateValue: " + updateValues);
         }
