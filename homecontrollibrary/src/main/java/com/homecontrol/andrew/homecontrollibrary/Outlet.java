@@ -8,8 +8,8 @@ package com.homecontrol.andrew.homecontrollibrary;
  * I was trying to make the modules update the json array so that when i load buttons from the array they match the changes made
  */
 public class Outlet extends Module {
-    private final String TAG = "Outlet";
-    public final static String TYPE = "outlet";
+    private static final String TAG = "Outlet";
+    public static final String TYPE = "outlet";
     private String state;
 
     public Outlet(String address, String n, String status){
@@ -36,7 +36,8 @@ public class Outlet extends Module {
     @Override
     public void update(ModifyModuleInterface activity){
         // updates name and state field in database, the only fields that will change with an outlet
-        String[] values = {"name", getName(), "state", state, getAddr()};
+        // last two arguments belong to the WHERE clause
+        String[] values = {"name", getName(), "state", state, "addr", getAddr()};
         activity.updateModuleData(values);
     }
 }

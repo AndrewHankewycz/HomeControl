@@ -4,7 +4,7 @@ package com.homecontrol.andrew.homecontrollibrary;
  * Created by andrew on 8/19/14.
  */
 public class Dimmer extends Module {
-    private static String TAG = "Dimmer";
+    private static final String TAG = "Dimmer";
     public final static String type = "dimmer";
     private int value;  // value 0 - 100
     private String state;   // for module being on/off, 0/1
@@ -46,7 +46,8 @@ public class Dimmer extends Module {
     @Override
     public void update(ModifyModuleInterface activity){
         // updates name , state and value in the database
-        String[] values = {"name", getName(), "state", state, "value", Integer.toString(value), getAddr()};
+        // last two arguments belong to the WHERE clause
+        String[] values = {"name", getName(), "state", state, "value", Integer.toString(value), "addr", getAddr()};
         activity.updateModuleData(values);
     }
 }
