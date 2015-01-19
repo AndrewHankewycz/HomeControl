@@ -46,7 +46,7 @@ public class Dimmer extends Module {
     @Override
     public void update(ModifyModuleInterface activity){
         // updates name , state and value in the database
-        // last two arguments belong to the WHERE clause
+        // the last two arguments belong to the WHERE clause
         String[] values = {"name", getName(), "state", state, "value", Integer.toString(value), "addr", getAddr()};
         activity.updateModuleData(values);
     }

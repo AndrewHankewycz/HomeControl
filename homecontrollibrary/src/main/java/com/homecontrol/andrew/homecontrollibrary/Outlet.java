@@ -36,7 +36,7 @@ public class Outlet extends Module {
     @Override
     public void update(ModifyModuleInterface activity){
         // updates name and state field in database, the only fields that will change with an outlet
-        // last two arguments belong to the WHERE clause
+        // the last two arguments belong to the WHERE clause
         String[] values = {"name", getName(), "state", state, "addr", getAddr()};
         activity.updateModuleData(values);
     }
