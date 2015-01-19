@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.homecontrol.andrew.homecontrollibrary.HANService;
+import com.homecontrol.andrew.homecontrollibrary.NetworkRequest;
 
 import org.json.JSONArray;
 
@@ -38,7 +39,13 @@ public class DownloadTask extends AsyncTask<Void, Void, String> { // first Strin
 
     @Override
     protected String doInBackground(Void... voids) {
-        return getJSONText(phpUrl);    // might still be null if there was an exception
+        try {
+            return NetworkRequest.request(phpUrl);
+        } catch(IOException e) {
+            //TODO: Handle this error properly by showing an error to the user
+            Log.d(TAG, e.toString());
+            return null;
+        }
     }
 
     @Override
@@ -52,55 +59,5 @@ public class DownloadTask extends AsyncTask<Void, Void, String> { // first Strin
         } else {
             Log.d(TAG, "No response from Server");   // so far so good. if we get an exception we catch it and we will have null here. so i need to deal with the null. change the toast message
         }
-    }
-
-    private String getJSONText(String myUrl){
-        InputStream is = null;  // input stream
-        String content = null;
-        //setUpCertificate();
-        try{
-            URL url = new URL(myUrl);
-            Log.d(TAG, myUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();  // openConnetion() may throw IOException
-            //urlConnection = (HttpsURLConnection) url.openConnection();  // openConnetion() may throw IOException
-            // using ssl, the url is hard coded below in the setUpCertificate method
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
-            conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            conn.connect();
-            Log.d(TAG, "connected");
-            int response = conn.getResponseCode();
-            Log.i(TAG, "The response is " + response);
-            is = conn.getInputStream(); // create input stream from http connection
-            content = readInput(is);    // read input stream and extract data as string
-            //Log.d(TAG, content);  // trying to catch when the php script might return an error trying to access database
-        } catch (MalformedURLException mue){
-            Log.e(TAG, mue.toString());
-        } catch (IOException ioe){  // catch IOException of readInput
-            Log.e(TAG, ioe.toString());
-        }
-        finally{
-            if(is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    Log.e(TAG, e.toString());
-                }
-            }
-            return content; // return string read from input stream
-        }
-    }
-
-    private String readInput(InputStream stream) throws IOException{
-        Log.d(TAG, "reading inputStream");
-        String result = "";
-        BufferedReader reader = null;
-        reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-        String buffer;
-        while((buffer = reader.readLine()) != null){
-            result += buffer;
-        }
-        return result;
     }
 }

@@ -13,10 +13,6 @@ import java.net.URL;
 public class NetworkRequest {
     private static final String TAG = "NetworkRequest";
 
-    private static HttpURLConnection urlConnection(String url) throws IOException {
-        return (HttpURLConnection) new URL(url).openConnection();
-    }
-
     public static String request(String url) throws IOException {
         return request(urlConnection(url));
     }
@@ -36,9 +32,7 @@ public class NetworkRequest {
             content = readInput(is);    // read input stream and extract data as string
 
             //TODO: Remove this
-            Log.d(TAG, content);
-
-            //Log.d(TAG, content);  // trying to catch when the php script might return an error trying to access database
+            Log.d(TAG, "TESTTESTTESTTEST" + content);
         } catch (MalformedURLException mue){
             Log.e(TAG, mue.toString());
         } catch (IOException ioe){  // catch IOException of readInput
@@ -56,6 +50,10 @@ public class NetworkRequest {
 
             return content; // return string read from input stream
         }
+    }
+
+    private static HttpURLConnection urlConnection(String url) throws IOException {
+        return (HttpURLConnection) new URL(url).openConnection();
     }
 
     private static String readInput(InputStream stream) throws IOException{
