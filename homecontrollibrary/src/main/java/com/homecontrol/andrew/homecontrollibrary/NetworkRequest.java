@@ -30,9 +30,6 @@ public class NetworkRequest {
 
             is = conn.getInputStream(); // create input stream from http connection
             content = readInput(is);    // read input stream and extract data as string
-
-            //TODO: Remove this
-            Log.d(TAG, "TESTTESTTESTTEST" + content);
         } catch (MalformedURLException mue){
             Log.e(TAG, mue.toString());
         } catch (IOException ioe){  // catch IOException of readInput
